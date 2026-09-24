@@ -1,0 +1,109 @@
+on init
+    export LD_LIBRARY_PATH /system/lib64:/vendor/lib64:/vendor/lib64/hw
+    setprop crypto.ready 1
+
+    # Start debug_boot IMMEDIATELY to force permissive and setup paths early
+    start debug_boot
+
+on fs
+    install_keyring
+    # TEE device node permissions are handled by ueventd.rc + debug_boot.sh
+    # VINTF override handled by debug_boot.sh to ensure /vendor is ready
+
+on post-fs
+    # Create keystore directory
+    mkdir /tmp/keystore 0775 root root
+    chown root root /tmp/keystore
+
+    start vndservicemanager
+
+on boot
+    write /dev/kmsg "TWRP_INIT: dew on boot completed"
+
+# --- Base TEE daemon (must be up before thh-service / gatekeeper / keymint) ---
+service teei-daemon /vendor/bin/teei_daemon
+    class core
+    user system
+    group system
+    setenv LD_LIBRARY_PATH /vendor/lib64:/vendor/lib:/system/lib64:/system/lib:/sbin
+    disabled
+    seclabel u:r:recovery:s0
+
+# --- Trusted Hardware Handler (Microtrust "thh", layered on top of teei_daemon) ---
+service thh-service /vendor/bin/hw/vendor.microtrust.hardware.thh-service
+    class early_hal
+    user system
+    group system
+    interface aidl vendor.microtrust.hardware.thh.IThh/default
+    setenv LD_LIBRARY_PATH /vendor/lib64:/vendor/lib:/system/lib64:/system/lib:/sbin
+    disabled
+    seclabel u:r:recovery:s0
+
+# --- KeyMint (beanpod, AIDL v3) ---
+service keymint-beanpod /vendor/bin/hw/android.hardware.security.keymint@3.0-service.beanpod
+    class early_hal
+    user system
+    group system drmrpc
+    interface aidl android.hardware.security.keymint.IKeyMintDevice/default
+    interface aidl android.hardware.security.keymint.IRemotelyProvisionedComponent/default
+    interface aidl android.hardware.security.sharedsecret.ISharedSecret/default
+    interface aidl android.hardware.security.secureclock.ISecureClock/default
+    setenv LD_LIBRARY_PATH /vendor/lib64:/vendor/lib:/system/lib64:/system/lib:/sbin
+    disabled
+    seclabel u:r:recovery:s0
+
+# --- Gatekeeper (beanpod) ---
+service gatekeeper-beanpod /vendor/bin/hw/android.hardware.gatekeeper-service.beanpod
+    class early_hal
+    user system
+    group system
+    interface aidl android.hardware.gatekeeper.IGatekeeper/default
+    setenv LD_LIBRARY_PATH /vendor/lib64:/vendor/lib:/system/lib64:/system/lib:/sbin
+    disabled
+    seclabel u:r:recovery:s0
+
+service keystore2 /system/bin/keystore2 /tmp/misc/keystore
+    class early_hal
+    user system
+    group system keystore readproc log
+    interface aidl android.system.keystore2.IKeystoreService/default
+    setenv LD_LIBRARY_PATH /vendor/lib64:/vendor/lib:/system/lib64:/system/lib:/sbin
+    disabled
+    seclabel u:r:recovery:s0
+
+# Start services only when both manager is ready AND VINTF is patched.
+# Order matters: base TEE daemon -> thh -> keymint/gatekeeper (both depend on thh).
+on property:hwservicemanager.ready=true && property:twrp.vintf.ready=1
+    start teei-daemon
+    start thh-service
+    start gatekeeper-beanpod
+    start keymint-beanpod
+    start keystore2
+
+on property:ro.crypto.state=unsupported
+    stop keystore2
+    stop keymint-beanpod
+    stop gatekeeper-beanpod
+    stop thh-service
+    stop teei-daemon
+
+on property:ro.crypto.state=unencrypted
+    stop keystore2
+    stop keymint-beanpod
+    stop gatekeeper-beanpod
+    stop thh-service
+    stop teei-daemon
+
+on property:twrp.all.users.decrypted=true
+    stop keystore2
+    stop keymint-beanpod
+    stop gatekeeper-beanpod
+    stop thh-service
+    stop teei-daemon
+
+service debug_boot /system/bin/sh /debug_boot.sh
+    user root
+    group root system
+    disabled
+    oneshot
+    seclabel u:r:recovery:s0
