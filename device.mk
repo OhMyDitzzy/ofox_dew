@@ -112,7 +112,7 @@ PRODUCT_SOONG_NAMESPACES += $(DEVICE_PATH)
 # before building, matching proprietary-files.txt.
 PRODUCT_COPY_FILES += \
     $(DEVICE_PATH)/recovery/root/debug_boot.sh:$(TARGET_COPY_OUT_RECOVERY)/root/debug_boot.sh \
-    $(DEVICE_PATH)/recovery/root/init.recovery.dew.rc:$(TARGET_COPY_OUT_RECOVERY)/root/init.recovery.mt6768.rc \
+    $(DEVICE_PATH)/recovery/root/init.recovery.mt6768.rc:$(TARGET_COPY_OUT_RECOVERY)/root/init.recovery.mt6768.rc \
     $(DEVICE_PATH)/recovery/root/manifest_fixed.xml:$(TARGET_COPY_OUT_RECOVERY)/root/manifest_fixed.xml \
     $(DEVICE_PATH)/recovery/root/vendor/bin/hw/android.hardware.gatekeeper-service.beanpod:$(TARGET_COPY_OUT_RECOVERY)/root/vendor/bin/hw/android.hardware.gatekeeper-service.beanpod \
     $(DEVICE_PATH)/recovery/root/vendor/bin/hw/vendor.microtrust.hardware.thh-service:$(TARGET_COPY_OUT_RECOVERY)/root/vendor/bin/hw/vendor.microtrust.hardware.thh-service \
