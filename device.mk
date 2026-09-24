@@ -133,6 +133,7 @@ PRODUCT_COPY_FILES += \
     $(DEVICE_PATH)/recovery/root/vendor/lib/libthhclient.so:$(TARGET_COPY_OUT_RECOVERY)/root/vendor/lib/libthhclient.so \
     $(DEVICE_PATH)/recovery/root/vendor/lib/hw/kmsetkey.beanpod.so:$(TARGET_COPY_OUT_RECOVERY)/root/vendor/lib/hw/kmsetkey.beanpod.so \
     $(DEVICE_PATH)/recovery/root/vendor/lib64/libteei_daemon_vfs.so:$(TARGET_COPY_OUT_RECOVERY)/root/vendor/lib64/libteei_daemon_vfs.so \
+    $(DEVICE_PATH)/recovery/root/vendor/lib64/libTEECommon.so:$(TARGET_COPY_OUT_RECOVERY)/root/vendor/lib64/libTEECommon.so \
     $(DEVICE_PATH)/recovery/root/vendor/lib64/libthhclient.so:$(TARGET_COPY_OUT_RECOVERY)/root/vendor/lib64/libthhclient.so \
     $(DEVICE_PATH)/recovery/root/vendor/lib64/vendor.microtrust.hardware.thh-V1-ndk.so:$(TARGET_COPY_OUT_RECOVERY)/root/vendor/lib64/vendor.microtrust.hardware.thh-V1-ndk.so \
     $(DEVICE_PATH)/recovery/root/vendor/lib64/hw/wechat.default.so:$(TARGET_COPY_OUT_RECOVERY)/root/vendor/lib64/hw/wechat.default.so \
