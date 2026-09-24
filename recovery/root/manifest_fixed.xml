@@ -57,12 +57,6 @@
             <instance>default</instance>
         </interface>
     </hal>
-
-    <!-- Gatekeeper (beanpod) -->
-    <!-- TODO-VERIFY: confirm AIDL vs HIDL + exact version against the vendor
-         .rc/.xml once extracted from stock ROM. Assumed AIDL because the
-         binary name follows the "-service.beanpod" AIDL convention, unlike
-         tornado's HIDL "@1.0-service". -->
     <hal format="aidl">
         <name>android.hardware.gatekeeper</name>
         <version>1</version>
@@ -72,9 +66,6 @@
         </interface>
     </hal>
 
-    <!-- Trusted Hardware Handler (Microtrust "thh", beanpod-specific,
-         not present on tornado/mitee) -->
-    <!-- TODO-VERIFY: exact version/instance against vendor .xml -->
     <hal format="aidl">
         <name>vendor.microtrust.hardware.thh</name>
         <version>1</version>
